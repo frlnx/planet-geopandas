@@ -1,5 +1,4 @@
 import geopandas
-import geojson
 import json
 from planet_geopandas import SearchResultSerializer
 
@@ -30,3 +29,13 @@ class TestSearchIntegration(object):
     def test_geometry_is_a_geoseries(self):
         df = self.target.geodataframe(self.data)
         assert isinstance(df.geometry, geopandas.GeoSeries)
+
+    def test_geometies_are_polygons(self):
+        df = self.target.geodataframe(self.data)
+        assert (df.geometry.geom_type == "Polygon").all()
+
+    def test_country_of_search_response(self):
+        df = self.target.geodataframe(self.data)
+        world = geopandas.read_file(geopandas.datasets.get_path('naturalearth_lowres'))
+        countries = geopandas.sjoin(df, world, how="inner", op='intersects')
+        assert (countries['name'] == 'United States').all()
