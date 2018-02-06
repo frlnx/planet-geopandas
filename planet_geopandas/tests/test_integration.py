@@ -20,4 +20,13 @@ class TestSearchIntegration(object):
     def test_all_dicts_are_converted_into_more_meaningful_values(self):
         df = self.target.geodataframe(self.data)
         for column in df.columns:
-            assert not df[column].apply(lambda x: isinstance(x, dict)).any(), "{} contains dicts".format(column)
+            try:
+                keys = df.loc[0, column].keys()
+            except AttributeError:
+                keys = "Could not find keys!"
+            assert not df[column].apply(lambda x: isinstance(x, dict)).any(),\
+                "{} contains dicts with keys {}".format(column, keys)
+
+    def test_geometry_is_a_geoseries(self):
+        df = self.target.geodataframe(self.data)
+        assert isinstance(df.geometry, geopandas.GeoSeries)
