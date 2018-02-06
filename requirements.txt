@@ -1,0 +1,4 @@
+geopandas
+requests
+geojson
+pytest
