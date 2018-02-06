@@ -16,3 +16,8 @@ class TestSearchIntegration(object):
     def test_create_dataframe(self):
         df = self.target.geodataframe(self.data)
         assert isinstance(df, geopandas.GeoDataFrame)
+
+    def test_all_dicts_are_converted_into_more_meaningful_values(self):
+        df = self.target.geodataframe(self.data)
+        for column in df.columns:
+            assert not df[column].apply(lambda x: isinstance(x, dict)).any(), "{} contains dicts".format(column)
