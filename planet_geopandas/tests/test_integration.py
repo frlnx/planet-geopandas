@@ -8,7 +8,7 @@ from planet_geopandas import SearchResultSerializer
 class TestSearchIntegration(object):
 
     def setup(self):
-        with open('search_response', 'r') as f:
+        with open('planet_geopandas/tests/mock_data/search_response', 'r') as f:
             self.data = json.load(f)
         self.target = SearchResultSerializer()
 
