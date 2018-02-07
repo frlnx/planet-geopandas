@@ -19,7 +19,7 @@ class ConditionFilter(object):
 class DateRangeFilter(ConditionFilter):
     """Matches dates that fall within a range."""
 
-    def __init__(self, field_name, gt=None, gte=None, lt=None, lte=None):
+    def __init__(self, field_name, gt=None, gte=None, lt=None, lte=None, timezone="Z"):
         assert field_name in ['acquired', 'published', 'updated']
         assert not (lt and lte), "lt and lte are mutually exclusive"
         assert not (gt and gte), "gt and gte are mutually exclusive"
@@ -29,7 +29,7 @@ class DateRangeFilter(ConditionFilter):
             if not val:
                 del config[key]
                 continue
-            config[key] = config[key].isoformat()
+            config[key] = config[key].isoformat() + timezone
         super().__init__(field_name, config)
 
 
