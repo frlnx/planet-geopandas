@@ -46,10 +46,8 @@ class PlanetAPI(object):
             "filter": filters.to_dict()
         }
         response = requests.post(self._quick_search_endpoint, json=query, auth=self.auth)
+        assert response.status_code == 200, response.content
         response_data = response.json()
         serializer = SearchResultSerializer()
-        try:
-            df = serializer.geodataframe(response_data)
-        except KeyError:
-            print(response.json())
+        df = serializer.geodataframe(response_data)
         return df

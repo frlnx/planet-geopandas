@@ -15,6 +15,21 @@ class ConditionFilter(object):
             "config": self.config
         }
 
+    def __and__(self, other):
+        if isinstance(other, AndFilter):
+            other.conditions.append(self)
+            return other
+        return AndFilter([self, other])
+
+    def __or__(self, other):
+        if isinstance(other, OrFilter):
+            other.conditions.append(self)
+            return other
+        return OrFilter([self, other])
+
+    def __neg__(self):
+        return NotFilter(self)
+
 
 class DateRangeFilter(ConditionFilter):
     """Matches dates that fall within a range."""
@@ -56,13 +71,14 @@ class RangeFilter(ConditionFilter):
     """Matches numbers that fall within a range."""
 
     def __init__(self, field_name, gt=None, gte=None, lt=None, lte=None):
-        assert field_name in ['acquired', 'published', 'updated']
+        assert field_name in ["sun_azimuth", "sun_elevation", "gsd", "view_angle", "cloud_cover", "black_fill",
+                              "usable_data", "origin_y"]
         assert not (lt and lte), "lt and lte are mutually exclusive"
         assert not (gt and gte), "gt and gte are mutually exclusive"
         config = {"gt": gt, "gte": gte, "lt": lt, "lte": lte}
         for key in list(config.keys()):
             val = config[key]
-            if not val:
+            if val is None:
                 del config[key]
 
         upper_bound = config.get('lt', config.get('lte', float('inf')))
