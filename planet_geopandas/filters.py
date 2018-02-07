@@ -60,7 +60,7 @@ class RangeFilter(ConditionFilter):
         assert not (lt and lte), "lt and lte are mutually exclusive"
         assert not (gt and gte), "gt and gte are mutually exclusive"
         config = {"gt": gt, "gte": gte, "lt": lt, "lte": lte}
-        for key in config:
+        for key in list(config.keys()):
             val = config[key]
             if not val:
                 del config[key]
