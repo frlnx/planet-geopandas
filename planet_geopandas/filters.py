@@ -53,7 +53,7 @@ class GeometryFilter(ConditionFilter):
 
     def __init__(self, geometry):
         assert geometry['type'] in ["Polygon", "MultiPolygon", "Feature", "FeatureCollection"]
-        assert isinstance(geometry['coordinates'], list)
+        assert isinstance(geometry['coordinates'], list) or isinstance(geometry['coordinates'], tuple)
         super().__init__("geometry", geometry)
 
 

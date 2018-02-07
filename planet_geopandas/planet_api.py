@@ -28,6 +28,10 @@ class PlanetAPI(object):
     """Copernicus Sentinel-2 Scenes"""
     sentinel_2l1c = "Sentinel2L1C"
 
+    headers = {
+        'User-Agent': 'Python planet-geopandas lib; https://github.com/frlnx/planet-geopandas'
+    }
+
     def __init__(self, username=None, password=None):
         if username is None:
             username = getenv("PLANET_API_USERNAME")
@@ -45,7 +49,7 @@ class PlanetAPI(object):
             "item_types": item_types,
             "filter": filters.to_dict()
         }
-        response = requests.post(self._quick_search_endpoint, json=query, auth=self.auth)
+        response = requests.post(self._quick_search_endpoint, json=query, auth=self.auth, headers=self.headers)
         assert response.status_code == 200, response.content
         response_data = response.json()
         serializer = SearchResultSerializer()
