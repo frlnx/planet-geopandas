@@ -1,5 +1,9 @@
-geopandas
 requests
 geojson
 pytest
+
+fiona
+pyproj
+shapely
 rtree
+geopandas
