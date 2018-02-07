@@ -39,3 +39,9 @@ class TestSearchIntegration(object):
         world = geopandas.read_file(geopandas.datasets.get_path('naturalearth_lowres'))
         countries = geopandas.sjoin(df, world, how="inner", op='intersects')
         assert (countries['name'] == 'United States').all()
+
+
+class TestQuickSearch(object):
+
+    def setup(self):
+        pass

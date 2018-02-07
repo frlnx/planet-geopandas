@@ -21,6 +21,9 @@ class SearchResultSerializer(object):
                 df[namespaced_column] = df[column].apply(lambda x: x.get(field))
             del df[column]
         df['geometry'] = df['geometry'].apply(shape)
+        df['properties.acquired'] = geopandas.pd.to_datetime(df['properties.acquired'])
+        df['properties.published'] = geopandas.pd.to_datetime(df['properties.published'])
+        df['properties.updated'] = geopandas.pd.to_datetime(df['properties.updated'])
         return df
 
     def geodataframe(self, data: dict):
