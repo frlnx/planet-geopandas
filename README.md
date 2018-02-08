@@ -21,5 +21,17 @@ Integrating geopandas with api.planet.com
     filters = DateRangeFilter(field_name='published', lt=datetime.now(), gt=datetime.now() - timedelta(days=4)) and \
         RangeFilter('cloud_cover', lte=0.0) and \
         GeometryFilter(sweden_geojson)
-    df = api.quick_search("test query", api.landsat_8l1g, filters)
+    df = api.quick_search("test query", api.landsat_8l1g, filters, max_results=500)
 
+###To visualize data, you could then do something like this:
+
+    import matplotlib.pyplot as plt
+
+    fig, ax = plt.subplots()
+
+    ax.set_aspect('equal')
+
+    world.loc[['Sweden']].plot(ax=ax, color='white', edgecolor='black')
+    df.plot(ax=ax, column='properties.cloud_cover', alpha=0.4)
+
+    plt.show()

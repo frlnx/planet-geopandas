@@ -3,9 +3,23 @@ from shapely.geometry import shape
 
 
 class SearchResultSerializer(object):
+    perms = ['assets.analytic_xml:download',
+             'assets.basic_analytic_dn:download',
+             'assets.basic_analytic_dn_xml:download',
+             'assets.basic_analytic_xml:download',
+             'assets.analytic_dn:download',
+             'assets.basic_udm:download',
+             'assets.analytic:download',
+             'assets.visual:download',
+             'assets.analytic_dn_xml:download',
+             'assets.basic_analytic_rpc:download',
+             'assets.basic_analytic_dn_rpc:download',
+             'assets.visual_xml:download',
+             'assets.basic_analytic:download',
+             'assets.udm:download']
 
     def __init__(self):
-        pass
+        self.df = geopandas.GeoDataFrame()
 
     def clean(self, df: geopandas.GeoDataFrame):
         unpack = {
@@ -20,13 +34,26 @@ class SearchResultSerializer(object):
                 namespaced_column = "{}.{}".format(column, field)
                 df[namespaced_column] = df[column].apply(lambda x: x.get(field))
             del df[column]
+        permission_df = geopandas.GeoDataFrame(df['_permissions'].apply(self._permission_dict).tolist())
+        df.merge(permission_df, left_index=True, right_index=True)
+        del df['_permissions']
         df['geometry'] = df['geometry'].apply(shape)
         df['properties.acquired'] = geopandas.pd.to_datetime(df['properties.acquired'])
         df['properties.published'] = geopandas.pd.to_datetime(df['properties.published'])
         df['properties.updated'] = geopandas.pd.to_datetime(df['properties.updated'])
         return df
 
-    def geodataframe(self, data: dict):
+    def _permission_dict(self, permission_list):
+        return {perm: perm in permission_list for perm in self.perms}
+
+    @property
+    def row_count(self):
+        return len(self.df)
+
+    def ingest(self, data: dict):
         df = geopandas.GeoDataFrame(data['features'])
         self.clean(df)
-        return df
+        self.df = self.df.append(df)
+
+    def geodataframe(self):
+        return self.df.reset_index(drop=True)

@@ -1,7 +1,9 @@
 import requests
+from requests.exceptions import Timeout
 from requests.auth import HTTPBasicAuth
 from getpass import getpass
 from os import getenv
+from time import sleep
 
 from planet_geopandas.search_result_serializer import SearchResultSerializer
 
@@ -40,6 +42,34 @@ class PlanetAPI(object):
             password = getpass()
         self.auth = HTTPBasicAuth(username, password)
 
+    @staticmethod
+    def retry_with_graceful_backoff(func, url, **args):
+        tries = 0
+        while tries < 10:
+            try:
+                return func(url, **args)
+            except Timeout:
+                tries += 1
+                if tries == 10:
+                    raise
+                sleep(tries ** 2)
+
+    @classmethod
+    def paginate_data_until_n_rows(cls, max_results, func, url, **args):
+        serializer = SearchResultSerializer()
+        n_results = 0
+        while n_results < max_results and url is not None:
+            response = cls.retry_with_graceful_backoff(func, url, **args)
+            assert response.status_code == 200, response.content
+            response_data = response.json()
+            serializer.ingest(response_data)
+            n_results = serializer.row_count
+            url = response_data["_links"].get("_next")
+            func = requests.get
+            if 'json' in args:
+                del args['json']
+        return serializer.geodataframe()
+
     def quick_search(self, name, item_types, filters, max_results=250):
         assert 1 <= len(name) <= 64
         if isinstance(item_types, str):
@@ -49,9 +79,6 @@ class PlanetAPI(object):
             "item_types": item_types,
             "filter": filters.to_dict()
         }
-        response = requests.post(self._quick_search_endpoint, json=query, auth=self.auth, headers=self.headers)
-        assert response.status_code == 200, response.content
-        response_data = response.json()
-        serializer = SearchResultSerializer()
-        df = serializer.geodataframe(response_data)
+        df = self.paginate_data_until_n_rows(max_results, requests.post, self._quick_search_endpoint,
+                                                    json=query, auth=self.auth, headers=self.headers)
         return df
