@@ -16,3 +16,12 @@ class TestFilterInstantiation(object):
         geometry = {"type": "Polygon", "coordinates": [[-1, -1], [1, -1], [1, 1], [-1, 1]]}
         GeometryFilter(geometry)
         assert True
+
+
+class TestRangeFilter(object):
+
+    def setup(self):
+        self.target = RangeFilter('cloud_cover', lte=0.0)
+
+    def test_range_filter_asserts_less_than_or_equal_to_zero_cloud_cover(self):
+        assert self.target.to_dict() == {'type': 'RangeFilter', 'field_name': 'cloud_cover', 'config': {'lte': 0.0}}
