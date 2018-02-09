@@ -32,7 +32,7 @@ Integrating geopandas with api.planet.com
 
     ax.set_aspect('equal')
 
-    world.loc[['Sweden']].plot(ax=ax, color='white', edgecolor='black')
     df.plot(ax=ax, column='properties.cloud_cover', alpha=0.4)
+    world.loc[['Sweden']].plot(ax=ax, color='None', edgecolor='black')
 
     plt.show()
