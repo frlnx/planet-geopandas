@@ -1,1 +1,1 @@
-from .search_result_serializer import SearchResultSerializer
+from .planet_api import PlanetAPI

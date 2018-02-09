@@ -3,13 +3,13 @@ Integrating geopandas with api.planet.com
 
 ## Usage
 
-1) Sign up to the planet.com
+1) Sign up on planet.com
 2) Put your username and password into the environment variables `PLANET_API_USERNAME` and `PLANET_API_PASSWORD`
 3) Execute the following example
 
 
     from planet_geopandas.filters import *
-    from planet_geopandas.planet_api import PlanetAPI
+    from planet_geopandas import PlanetAPI
     import geopandas as gpd
     from datetime import datetime, timedelta
 
