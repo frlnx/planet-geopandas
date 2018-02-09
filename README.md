@@ -11,6 +11,7 @@ Integrating geopandas with api.planet.com
     from planet_geopandas.filters import *
     from planet_geopandas.planet_api import PlanetAPI
     import geopandas as gpd
+    from datetime import datetime, timedelta
     from shapely.geometry import mapping
 
     world = gpd.read_file(gpd.datasets.get_path('naturalearth_lowres'))
