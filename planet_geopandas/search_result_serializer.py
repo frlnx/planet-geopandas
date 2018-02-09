@@ -51,6 +51,9 @@ class SearchResultSerializer(object):
         return len(self.df)
 
     def ingest(self, data: dict):
+        features = data['features']
+        if len(features) == 0:
+            raise AttributeError("No lines given")
         df = geopandas.GeoDataFrame(data['features'])
         self.clean(df)
         self.df = self.df.append(df)

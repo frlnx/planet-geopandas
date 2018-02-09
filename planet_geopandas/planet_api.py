@@ -47,17 +47,16 @@ class PlanetAPI(object):
         tries = 0
         while tries < 10:
             try:
-                timeout = False
                 response = func(url, **args)
             except Timeout:
-                timeout = True
-            if response.status_code == 429 or timeout:
-                tries += 1
-                if tries == 10:
-                    raise
-                sleep(tries ** 2)
+                pass
             else:
-                return response
+                if response.status_code != 429:
+                    return response
+            tries += 1
+            if tries == 10:
+                raise Timeout()
+            sleep(tries ** 2)
 
 
     @classmethod
@@ -68,7 +67,10 @@ class PlanetAPI(object):
             response = cls.retry_with_graceful_backoff(func, url, **args)
             assert response.status_code == 200, response.content
             response_data = response.json()
-            serializer.ingest(response_data)
+            try:
+                serializer.ingest(response_data)
+            except AttributeError:
+                break
             n_results = serializer.row_count
             url = response_data["_links"].get("_next")
             func = requests.get
@@ -86,5 +88,5 @@ class PlanetAPI(object):
             "filter": filters.to_dict()
         }
         df = self.paginate_data_until_n_rows(max_results, requests.post, self._quick_search_endpoint,
-                                                    json=query, auth=self.auth, headers=self.headers)
+                                             json=query, auth=self.auth, headers=self.headers)
         return df
