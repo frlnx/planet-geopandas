@@ -1,7 +1,7 @@
 # Planet Geopandas
 Integrating geopandas with api.planet.com
 
-##Usage
+## Usage
 
 1) Sign up to the planet.com
 2) Put your username and password into the environment variables `PLANET_API_USERNAME` and `PLANET_API_PASSWORD`
@@ -24,7 +24,7 @@ Integrating geopandas with api.planet.com
         GeometryFilter(sweden_geojson)
     df = api.quick_search("test query", api.landsat_8l1g, filters, max_results=500)
 
-###To visualize data, you could then do something like this:
+### To visualize data, you could then do something like this:
 
     import matplotlib.pyplot as plt
 
