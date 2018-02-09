@@ -31,7 +31,7 @@ class ConditionFilter(object):
             return other
         return OrFilter([self, other])
 
-    def __neg__(self):
+    def __invert__(self):
         return NotFilter(self)
 
 
@@ -126,14 +126,25 @@ class LogicalFilter(Filter):
             "config": [condition.to_dict() for condition in self.conditions]
         }
 
+    def __and__(self, other):
+        self.conditions.append(other)
+        return self
+
+    def __or__(self, other):
+        if isinstance(other, ConditionFilter):
+            self.conditions.append(other)
+            return other
+        return OrFilter([self, other])
+
+    def __invert__(self):
+        return NotFilter(self)
+
 
 class AndFilter(LogicalFilter):
     pass
 
-
 class OrFilter(LogicalFilter):
     pass
-
 
 class NotFilter(LogicalFilter):
     pass

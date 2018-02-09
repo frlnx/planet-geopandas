@@ -17,8 +17,8 @@ Integrating geopandas with api.planet.com
     world.set_index('name', inplace=True)
     
     api = PlanetAPI()
-    filters = DateRangeFilter(field_name='published', lt=datetime.now(), gt=datetime.now() - timedelta(days=1)) and \
-        RangeFilter('cloud_cover', lte=0.1, gte=0.01) and \
+    filters = DateRangeFilter(field_name='published', lt=datetime.now(), gt=datetime.now() - timedelta(days=1)) & \
+        RangeFilter('cloud_cover', lte=0.1, gte=0.01) & \
         GeometryFilter.from_geopandas(world.loc[['Sweden', 'Norway'], 'geometry'])
     df = api.quick_search("test query", api.landsat_8l1g, filters, max_results=500)
 

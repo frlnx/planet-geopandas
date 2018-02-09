@@ -1,6 +1,6 @@
 import geopandas
 import json
-from planet_geopandas import SearchResultSerializer
+from planet_geopandas.search_result_serializer import SearchResultSerializer
 
 
 class TestSearchIntegration(object):
