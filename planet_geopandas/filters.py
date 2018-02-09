@@ -1,3 +1,7 @@
+from shapely.geometry import mapping
+from functools import reduce
+
+
 class Filter(object):
     def __init__(self, conditions):
         self.conditions = conditions
@@ -53,8 +57,25 @@ class GeometryFilter(ConditionFilter):
 
     def __init__(self, geometry):
         assert geometry['type'] in ["Polygon", "MultiPolygon", "Feature", "FeatureCollection"]
-        assert isinstance(geometry['coordinates'], list) or isinstance(geometry['coordinates'], tuple)
+        if geometry['type'] in ['Polygon', 'MultiPolygon']:
+            assert isinstance(geometry['coordinates'], list) or isinstance(geometry['coordinates'], tuple)
+        else:
+            assert isinstance(geometry['features'], list) or isinstance(geometry['features'], tuple)
         super().__init__("geometry", geometry)
+
+    @classmethod
+    def from_geopandas(cls, geopandas_df):
+        return cls({
+            'type': 'MultiPolygon', 'coordinates':
+            reduce(lambda x, y: x + y, map(cls._multi_polygonize, geopandas_df.geometry.apply(mapping).tolist()))
+        })
+
+    @staticmethod
+    def _multi_polygonize(d):
+        if d['type'] == "MultiPolygon":
+            return d['coordinates']
+        else:
+            return [d['coordinates']]
 
 
 class NumberInFilter(ConditionFilter):
@@ -90,6 +111,7 @@ class RangeFilter(ConditionFilter):
 
 class StringInFilter(ConditionFilter):
     """Matches any string within the array of provided strings."""
+
     def __init__(self, field_name, string_list):
         assert field_name in ["catalog_id", "strip_id", "item_type", "grid_cell",
                               "satellite_id", "provider", "ground_control"]

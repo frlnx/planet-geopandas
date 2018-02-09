@@ -12,16 +12,14 @@ Integrating geopandas with api.planet.com
     from planet_geopandas.planet_api import PlanetAPI
     import geopandas as gpd
     from datetime import datetime, timedelta
-    from shapely.geometry import mapping
 
     world = gpd.read_file(gpd.datasets.get_path('naturalearth_lowres'))
     world.set_index('name', inplace=True)
-    sweden_geojson = mapping(world.loc['Sweden', 'geometry'])
-     
+    
     api = PlanetAPI()
-    filters = DateRangeFilter(field_name='published', lt=datetime.now(), gt=datetime.now() - timedelta(days=4)) and \
-        RangeFilter('cloud_cover', lte=0.0) and \
-        GeometryFilter(sweden_geojson)
+    filters = DateRangeFilter(field_name='published', lt=datetime.now(), gt=datetime.now() - timedelta(days=1)) and \
+        RangeFilter('cloud_cover', lte=0.1, gte=0.01) and \
+        GeometryFilter.from_geopandas(world.loc[['Sweden', 'Norway'], 'geometry'])
     df = api.quick_search("test query", api.landsat_8l1g, filters, max_results=500)
 
 ### To visualize data, you could then do something like this:
@@ -32,7 +30,7 @@ Integrating geopandas with api.planet.com
 
     ax.set_aspect('equal')
 
-    df.plot(ax=ax, column='properties.cloud_cover', alpha=0.4)
-    world.loc[['Sweden']].plot(ax=ax, color='None', edgecolor='black')
+    df.plot(ax=ax, column='properties.usable_data', alpha=0.4)
+    world.loc[['Sweden', 'Norway']].plot(ax=ax, color='None', edgecolor='black')
 
     plt.show()

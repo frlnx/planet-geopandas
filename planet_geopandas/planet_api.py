@@ -47,12 +47,18 @@ class PlanetAPI(object):
         tries = 0
         while tries < 10:
             try:
-                return func(url, **args)
+                timeout = False
+                response = func(url, **args)
             except Timeout:
+                timeout = True
+            if response.status_code == 429 or timeout:
                 tries += 1
                 if tries == 10:
                     raise
                 sleep(tries ** 2)
+            else:
+                return response
+
 
     @classmethod
     def paginate_data_until_n_rows(cls, max_results, func, url, **args):
